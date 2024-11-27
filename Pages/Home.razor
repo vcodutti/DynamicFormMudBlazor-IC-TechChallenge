@@ -1,0 +1,91 @@
+﻿@page "/"
+@using DynamicFormMudBlazor.Models
+@using DynamicFormMudBlazor.Shared
+@using DynamicFormMudBlazor.Interfaces
+@using MudBlazor
+@using System.Text.Json
+@using System.Linq
+
+@inject ISnackbar Snackbar
+@inject IFormHandlerService FormHandlerService
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mud-theme-default pa-4">
+    <MudText Typo="Typo.h4" Align="Align.Center" Class="mb-4">@FormConfig.Title</MudText>
+
+    <MudForm @ref="MudForm">
+        <MudGrid Spacing="2">
+            @foreach (var field in FormConfig.Fields)
+            {
+                <MudItem xs="12">
+                    @if (field.Type == "text" || field.Type == "email")
+                    {
+                        <TextField Field="field" />
+                    }
+                    else if (field.Type == "number")
+                    {
+                        <NumericField Field="field" />
+                    }
+                    else if (field.Type == "dropdown")
+                    {
+                        <DropdownField Field="field" />
+                    }
+                    else if (field.Type == "checkbox")
+                    {
+                        <CheckboxField Field="field" />
+                    }
+                </MudItem>
+            }
+        </MudGrid>
+
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="mt-4" OnClick="HandleSubmit">
+            Submit
+        </MudButton>
+    </MudForm>
+
+    <MudPaper Class="mt-4 p-4">
+        <MudText Typo="Typo.subtitle2">Form Output:</MudText>
+        <MudText Typo="Typo.body1">@Output</MudText>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    private MudForm? MudForm;
+    private FormConfiguration FormConfig = new()
+        {
+            Title = "Dynamic MudBlazor Form",
+            Fields = new()
+            {
+                new FormField { Type = "text", Label = "Name", Required = true },
+                new FormField { Type = "email", Label = "Email", Required = true },
+                new FormField { Type = "number", Label = "Age", Min = 18, Max = 100 },
+                new FormField { Type = "dropdown", Label = "Industry", Values = new List<string>() { "Tech", "Production", "Health" }, Required = true },
+                new FormField { Type = "checkbox", Label = "Subscribe to Newsletter" }
+            }
+        };
+
+    private string Output = string.Empty;
+
+    private async Task HandleSubmit()
+    {
+        try
+        {
+            await MudForm.Validate();
+
+            if (MudForm.IsValid)
+            {
+                var outputDict = await FormHandlerService.HandleFormSubmission(FormConfig);
+                Output = JsonSerializer.Serialize(outputDict);
+
+                Snackbar.Add("Form submitted successfully!", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add("Form is not valid. Please correct the errors and try again.", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+        }
+    }
+}

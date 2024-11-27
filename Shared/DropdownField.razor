@@ -1,0 +1,55 @@
+﻿@using DynamicFormMudBlazor.Models
+@using MudBlazor
+
+<MudSelect T="string"
+           Value="@DropdownValue"
+           ValueChanged="@((string val) => DropdownValue = val)"
+           Label="@Field.Label"
+           Variant="Variant.Filled"
+           Required="@Field.Required">
+    @if (Field.Values != null && Field.Values.Any())
+    {
+        @foreach (var option in Field.Values)
+        {
+            <MudSelectItem T="string" Value="@option">@option</MudSelectItem>
+        }
+    }
+    else
+    {
+        <MudSelectItem T="string" Disabled="true">No options available</MudSelectItem>
+    }
+</MudSelect>
+
+@code {
+    [Parameter] public FormField Field { get; set; } = new();
+
+    private string DropdownValue
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(Field.Value) && Field.Values != null && Field.Values.Any())
+            {
+                Field.Value = Field.Values.First();
+            }
+            return Field.Value;
+        }
+        set => Field.Value = value;
+    }
+
+    //Method to check values of the dropdown - for debugging purposes
+    // protected override void OnParametersSet()
+    // {
+    //     base.OnParametersSet();
+
+    //     if (Field.Values == null || !Field.Values.Any())
+    //     {
+    //         Console.WriteLine($"[DropdownField] Warning: Field.Values is null or empty for {Field.Label}");
+    //     }
+    //     else
+    //     {
+    //         Console.WriteLine($"[DropdownField] Loaded values for {Field.Label}: {string.Join(", ", Field.Values)}");
+    //     }
+    // }
+}
+
+

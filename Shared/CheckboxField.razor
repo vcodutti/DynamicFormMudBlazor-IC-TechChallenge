@@ -1,0 +1,12 @@
+﻿@using DynamicFormMudBlazor.Models
+@using MudBlazor
+
+<MudCheckBox T="bool"
+             Checked="@Field.IsChecked"
+             CheckedChanged="@((bool val) => Field.IsChecked = val)"
+             Label="@Field.Label" /> 
+
+@code {
+    [Parameter] public FormField Field { get; set; } = new();
+}
+

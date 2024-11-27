@@ -1,0 +1,38 @@
+﻿@using DynamicFormMudBlazor.Models
+@using MudBlazor
+
+<MudTextField T="string"
+              Value="@Field.Value"
+              ValueChanged="@((string val) => Field.Value = val)"
+              Label="@Field.Label"
+              Variant="Variant.Filled"
+              Required="@Field.Required"
+              ErrorText="@ErrorText"
+              InputType="@GetInputType()" />
+
+@code {
+    [Parameter] public FormField Field { get; set; } = new();
+
+    private string? ErrorText
+    {
+        get
+        {
+            if (Field.Required && string.IsNullOrWhiteSpace(Field.Value))
+            {
+                return $"{Field.Label} is required.";
+            }
+            return null;
+        }
+    }
+
+    private InputType GetInputType()
+    {
+        return Field.Type switch
+        {
+            "text" => InputType.Text,
+            "email" => InputType.Email,
+            _ => InputType.Text
+        };
+    }
+}
+

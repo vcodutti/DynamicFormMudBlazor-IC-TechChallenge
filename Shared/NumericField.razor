@@ -1,0 +1,33 @@
+﻿@using DynamicFormMudBlazor.Models
+@using MudBlazor
+
+<MudNumericField T="int" 
+                 Value="@FieldValueAsInt"
+                 ValueChanged="@((int val) => FieldValueAsInt = val)"
+                 Label="@Field.Label"
+                 Variant="Variant.Filled"
+                 Min="@(Field.Min ?? int.MinValue)"
+                 Max="@(Field.Max ?? int.MaxValue)"
+                 Immediate="true" />
+
+@code {
+    [Parameter] public FormField Field { get; set; } = new();
+
+    private int FieldValueAsInt
+    {
+        get
+        {
+            if (int.TryParse(Field.Value, out var result))
+            {
+                return result;
+            }
+            else
+            {
+                var minValue = Field.Min ?? int.MinValue;
+                Field.Value = minValue.ToString();
+                return minValue;
+            }
+        }
+        set => Field.Value = value.ToString();
+    }
+}
